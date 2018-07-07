@@ -23,7 +23,7 @@ apply plugin: "io.spring.dependency-management"
 apply plugin: 'jacoco'
 
 apply from: 'build-quality.gradle'
-apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-info.gradle'
+//apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-info.gradle'
 apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-docker.gradle'
 
 
@@ -199,9 +199,9 @@ bintray {
     }
 }
 
-ext {
-    grgit = org.ajoberstar.grgit.Grgit.open(dir: '.')
-}
+//ext {
+//    grgit = org.ajoberstar.grgit.Grgit.open(dir: '.')
+//}
 
 task releaseDockerfile(type: Copy) {
     /* copy dockerfile and replace version of JAR */
@@ -237,3 +237,25 @@ jacocoTestReport {
 }
 
 build.dependsOn jacocoTestReport
+
+jar {
+  archiveName = "service-authorization.jar"
+}
+
+task resolveDependencies {
+  doLast {
+    rootProject.allprojects { project ->
+      project.buildscript.configurations.forEach { configuration ->
+        if (configuration.isCanBeResolved()) {
+          configuration.resolve()
+        }
+      }
+
+      project.configurations.forEach { configuration ->
+        if (configuration.isCanBeResolved()) {
+          configuration.resolve()
+        }
+      }
+    }
+  }
+}
